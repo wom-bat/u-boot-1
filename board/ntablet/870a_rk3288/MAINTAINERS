@@ -1,0 +1,6 @@
+NTABLET
+M:	Simon Chen <simon@yeacreate.com>
+S:	Maintained
+F:	board/ntablet/870a_rk3288
+F:	include/configs/870a_rk3288.h
+F:	configs/rk3288-ntablet-870a_defconfig
