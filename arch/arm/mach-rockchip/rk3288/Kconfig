@@ -76,6 +76,15 @@ config TARGET_MIQI_RK3288
 	  ports, HDMI, micro-SD card, 16 GB eMMC and Gigabit Ethernet. It
 	  has 1 or 2 GiB SDRAM. Expansion connectors provide access to
 	  I2C, SPI, UART, GPIOs and fan control.
+	  
+config TARGET_NTABLET_RK3288
+	bool "Ntablet-RK3288"
+	select BOARD_LATE_INIT
+	help
+	  Ntablet-RK3288 is a RK3288-based development board with 2 USB 2.0
+	  ports, HDMI, micro-SD card, 16 GB eMMC. 
+	  It has 1 or 2 GiB SDRAM. Expansion connectors provide access to
+	  I2C, SPI, UART, GPIOs.
 
 config TARGET_PHYCORE_RK3288
 	bool "phyCORE-RK3288"
@@ -182,6 +191,8 @@ source "board/firefly/firefly-rk3288/Kconfig"
 source "board/google/veyron/Kconfig"
 
 source "board/mqmaker/miqi_rk3288/Kconfig"
+
+source "board/ntablet/870a_rk3288/Kconfig"
 
 source "board/phytec/phycore_rk3288/Kconfig"
 

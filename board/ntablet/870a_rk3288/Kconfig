@@ -1,0 +1,15 @@
+if TARGET_NTABLET_RK3288
+
+config SYS_BOARD
+	default "870a_rk3288"
+
+config SYS_VENDOR
+	default "ntablet"
+
+config SYS_CONFIG_NAME
+	default "870a_rk3288"
+
+config BOARD_SPECIFIC_OPTIONS # dummy
+	def_bool y
+
+endif
