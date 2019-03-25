@@ -50,6 +50,22 @@ DECLARE_GLOBAL_DATA_PTR;
 #define CPUID_LEN       0x10
 #define CPUID_OFF       0x7
 
+static int rockchip_set_ethaddr(void)
+{
+#ifdef CONFIG_ROCKCHIP_VENDOR_PARTITION
+	int ret;
+	u8 ethaddr[ARP_HLEN];
+	char buf[ARP_HLEN_ASCII + 1];
+
+	ret = vendor_storage_read(VENDOR_LAN_MAC_ID, ethaddr, sizeof(ethaddr));
+	if (ret > 0 && is_valid_ethaddr(ethaddr)) {
+		sprintf(buf, "%pM", ethaddr);
+		env_set("ethaddr", buf);
+	}
+#endif
+	return 0;
+}
+
 static int rockchip_set_serialno(void)
 {
 	char serialno_str[VENDOR_SN_MAX];
@@ -137,6 +153,7 @@ __weak int set_armclk_rate(void)
 
 int board_late_init(void)
 {
+	rockchip_set_ethaddr();
 	rockchip_set_serialno();
 #if (CONFIG_ROCKCHIP_BOOT_MODE_REG > 0)
 	setup_boot_mode();
@@ -265,22 +282,98 @@ int interrupt_debugger_init(void)
 	return ret;
 }
 
+#if defined(CONFIG_ROCKCHIP_RK1808) && !defined(CONFIG_COPROCESSOR_RK1808)
+#define PINCTRL_EMMC_BUS8_PATH		"/pinctrl/emmc/emmc-bus8"
+#define PINCTRL_EMMC_CMD_PATH		"/pinctrl/emmc/emmc-cmd"
+#define PINCTRL_EMMC_CLK_PATH		"/pinctrl/emmc/emmc-clk"
+#define PINCTRL_PCFG_PU_2MA_PATH	"/pinctrl/pcfg-pull-up-2ma"
+#define MAX_ROCKCHIP_PINS_ENTRIES	12
+
+static int rockchip_pinctrl_cfg_fdt_fixup(const char *path, u32 new_phandle)
+{
+	u32 cells[MAX_ROCKCHIP_PINS_ENTRIES * 4];
+	const u32 *data;
+	int i, count;
+	int node;
+
+	node = fdt_path_offset(gd->fdt_blob, path);
+	if (node < 0) {
+		debug("%s: can't find: %s\n", __func__, path);
+		return node;
+	}
+
+	data = fdt_getprop(gd->fdt_blob, node, "rockchip,pins", &count);
+	if (!data) {
+		debug("%s: can't find prop \"rockchip,pins\"\n", __func__);
+		return -ENODATA;
+	}
+
+	count /= sizeof(u32);
+	if (count > MAX_ROCKCHIP_PINS_ENTRIES * 4) {
+		debug("%s: %d is over max count\n", __func__, count);
+		return -EINVAL;
+	}
+
+	for (i = 0; i < count; i++)
+		cells[i] = data[i];
+
+	for (i = 0; i < (count >> 2); i++)
+		cells[4 * i + 3] = cpu_to_fdt32(new_phandle);
+
+	fdt_setprop((void *)gd->fdt_blob, node, "rockchip,pins",
+		    &cells, count * sizeof(u32));
+
+	return 0;
+}
+#endif
+
 int board_fdt_fixup(void *blob)
 {
-	__maybe_unused int ret = 0;
+	int ret = 0;
 
+	/*
+	 * Common fixup for DRM
+	 */
 #ifdef CONFIG_DRM_ROCKCHIP
 	rockchip_display_fixup(blob);
 #endif
 
+	/*
+	 * Platform fixup:
+	 *
+	 * - RK3288: Recognize RK3288W by HDMI Revision ID is 0x1A;
+	 * - RK1808: MMC strength 2mA;
+	 */
 #ifdef CONFIG_ROCKCHIP_RK3288
-	/* RK3288W HDMI Revision ID is 0x1A */
 	if (readl(0xff980004) == 0x1A) {
 		ret = fdt_setprop_string(blob, 0,
 					 "compatible", "rockchip,rk3288w");
 		if (ret)
 			printf("fdt set compatible failed: %d\n", ret);
 	}
+#elif defined(CONFIG_ROCKCHIP_RK1808) && !defined(CONFIG_COPROCESSOR_RK1808)
+	struct tag *t;
+	u32 ph_pu_2ma;
+
+	t = atags_get_tag(ATAG_SOC_INFO);
+	if (!t)
+		return 0;
+
+	debug("soc=0x%x, flags=0x%x\n", t->u.soc.name, t->u.soc.flags);
+
+	if (t->u.soc.flags != SOC_FLAGS_ET00)
+		return 0;
+
+	ph_pu_2ma = fdt_get_phandle(gd->fdt_blob,
+		    fdt_path_offset(gd->fdt_blob, PINCTRL_PCFG_PU_2MA_PATH));
+	if (!ph_pu_2ma) {
+		debug("Can't find: %s\n", PINCTRL_PCFG_PU_2MA_PATH);
+		return -EINVAL;
+	}
+
+	ret |= rockchip_pinctrl_cfg_fdt_fixup(PINCTRL_EMMC_BUS8_PATH, ph_pu_2ma);
+	ret |= rockchip_pinctrl_cfg_fdt_fixup(PINCTRL_EMMC_CMD_PATH, ph_pu_2ma);
+	ret |= rockchip_pinctrl_cfg_fdt_fixup(PINCTRL_EMMC_CLK_PATH, ph_pu_2ma);
 #endif
 
 	return ret;
