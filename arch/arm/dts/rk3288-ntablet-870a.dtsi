@@ -13,6 +13,11 @@
 		device_type = "memory";
 		reg = <0x0 0x80000000>;
 	};
+	
+	aliases {
+		//rtc0 = &i2c_rtc;
+		rtc1 = &rk818;
+	};
 
 	adc-keys {
 		compatible = "adc-keys";
@@ -33,6 +38,14 @@
 		#clock-cells = <0>;
 		clock-frequency = <125000000>;
 		clock-output-names = "ext_gmac";
+	};
+	
+	io_domains: io_domains {
+		compatible = "rockchip,rk3288-io-voltage-domain";
+
+		status = "okay";
+		sdcard-supply = <&vccio_sd>;
+		wifi-supply = <&vccio_wl>;
 	};
 
 	keys: gpio-keys {
