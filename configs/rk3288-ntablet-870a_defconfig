@@ -760,6 +760,7 @@ CONFIG_SPL_CLK=y
 CONFIG_TPL_CLK=y
 # CONFIG_CLK_AT91 is not set
 # CONFIG_CPU is not set
+# CONFIG_AMP is not set
 
 #
 # Hardware crypto devices
@@ -859,6 +860,7 @@ CONFIG_MISC=y
 # CONFIG_ALTERA_SYSID is not set
 # CONFIG_ATSHA204A is not set
 # CONFIG_ROCKCHIP_EFUSE is not set
+# CONFIG_ROCKCHIP_OTP is not set
 # CONFIG_CROS_EC is not set
 # CONFIG_DS4510 is not set
 # CONFIG_FSL_SEC_MON is not set
@@ -1033,7 +1035,7 @@ CONFIG_SPL_RAM=y
 CONFIG_TPL_RAM=y
 # CONFIG_STM32_SDRAM is not set
 # CONFIG_DM_RAMDISK is not set
-# CONFIG_ROCKCHIP_DMC is not set
+CONFIG_ROCKCHIP_DMC=y
 # CONFIG_ROCKCHIP_SDRAM_COMMON is not set
 
 #
@@ -1050,7 +1052,10 @@ CONFIG_TPL_RAM=y
 #
 # Real Time Clock
 #
-# CONFIG_DM_RTC is not set
+CONFIG_DM_RTC=y
+# CONFIG_RTC_PCF2127 is not set
+# CONFIG_RTC_DS1307 is not set
+CONFIG_RTC_RK8XX=y
 # CONFIG_SCSI is not set
 # CONFIG_DM_SCSI is not set
 
@@ -1253,6 +1258,7 @@ CONFIG_REGEX=y
 # CONFIG_SPL_TINY_MEMSET is not set
 CONFIG_TPL_TINY_MEMSET=y
 CONFIG_SYSMEM=y
+CONFIG_BIDRAM=y
 CONFIG_CMD_DHRYSTONE=y
 
 #

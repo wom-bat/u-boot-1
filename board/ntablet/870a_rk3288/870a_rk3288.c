@@ -10,4 +10,6 @@
 #include <spl.h>
 #include <i2c.h>
 #include <power/rk8xx_pmic.h>
+#include <power/pmic.h>
+
 
