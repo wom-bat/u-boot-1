@@ -5,8 +5,10 @@
  */
 #include <common.h>
 #include <clk.h>
+#include <bidram.h>
 #include <dm.h>
 #include <debug_uart.h>
+#include <memblk.h>
 #include <ram.h>
 #include <syscon.h>
 #include <sysmem.h>
@@ -379,6 +381,45 @@ int board_fdt_fixup(void *blob)
 	return ret;
 }
 
+#ifdef CONFIG_ARM64_BOOT_AARCH32
+/*
+ * Fixup MMU region attr for OP-TEE on ARMv8 CPU:
+ *
+ * What ever U-Boot is 64-bit or 32-bit mode, the OP-TEE is always 64-bit mode.
+ *
+ * Command for OP-TEE:
+ *	64-bit mode: dcache is always enabled;
+ *	32-bit mode: dcache is always disabled(Due to some unknown issue);
+ *
+ * Command for U-Boot:
+ *	64-bit mode: MMU table is static defined in rkxxx.c file, all memory
+ *		     regions are mapped. That's good to match OP-TEE MMU policy.
+ *
+ *	32-bit mode: MMU table is setup according to gd->bd->bi_dram[..] where
+ *		     the OP-TEE region has been reserved, so it can not be
+ *		     mapped(i.e. dcache is disabled). That's also good to match
+ *		     OP-TEE MMU policy.
+ *
+ * For the data coherence when communication between U-Boot and OP-TEE, U-Boot
+ * should follow OP-TEE MMU policy.
+ *
+ * Here is the special:
+ *	When CONFIG_ARM64_BOOT_AARCH32 is enabled, U-Boot is 32-bit mode while
+ *	OP-TEE is still 64-bit mode. U-Boot would not map MMU table for OP-TEE
+ *	region(but OP-TEE requires it cacheable) so we fixup here.
+ */
+int board_initr_caches_fixup(void)
+{
+	struct memblock mem;
+
+	mem = param_parse_optee_mem();
+	if (mem.size)
+		mmu_set_region_dcache_behaviour(mem.base, mem.size,
+						DCACHE_WRITEBACK);
+	return 0;
+}
+#endif
+
 void board_quiesce_devices(void)
 {
 #ifdef CONFIG_ROCKCHIP_PRELOADER_ATAGS
@@ -442,31 +483,36 @@ void board_lmb_reserve(struct lmb *lmb)
 }
 #endif
 
-#ifdef CONFIG_SYSMEM
-int board_sysmem_reserve(struct sysmem *sysmem)
+#ifdef CONFIG_BIDRAM
+int board_bidram_reserve(struct bidram *bidram)
 {
-	struct sysmem_property prop;
+	struct memblock mem;
 	int ret;
 
 	/* ATF */
-	prop = param_parse_atf_mem();
-	ret = sysmem_reserve(prop.name, prop.base, prop.size);
+	mem = param_parse_atf_mem();
+	ret = bidram_reserve(MEMBLK_ID_ATF, mem.base, mem.size);
 	if (ret)
 		return ret;
 
 	/* PSTORE/ATAGS/SHM */
-	prop = param_parse_common_resv_mem();
-	ret = sysmem_reserve(prop.name, prop.base, prop.size);
+	mem = param_parse_common_resv_mem();
+	ret = bidram_reserve(MEMBLK_ID_SHM, mem.base, mem.size);
 	if (ret)
 		return ret;
 
 	/* OP-TEE */
-	prop = param_parse_optee_mem();
-	ret = sysmem_reserve(prop.name, prop.base, prop.size);
+	mem = param_parse_optee_mem();
+	ret = bidram_reserve(MEMBLK_ID_OPTEE, mem.base, mem.size);
 	if (ret)
 		return ret;
 
 	return 0;
+}
+
+parse_fn_t board_bidram_parse_fn(void)
+{
+	return param_parse_ddr_mem;
 }
 #endif
 
