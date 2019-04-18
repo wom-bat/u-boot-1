@@ -1,23 +1,16 @@
 /*
- * (C) Copyright 2018 Yeacreate Co., Ltd
+ * (C) Copyright 2019 YeaCreate Co., Ltd
  *
  * SPDX-License-Identifier:     GPL-2.0+ X11
  */
 
 /dts-v1/;
-
 #include "rk3288-ntablet-870a.dtsi"
+#include "rk3288-u-boot.dtsi"
 
 / {
 	model = "rk3288-ntablet";
 	compatible = "yeacreate,ntablet-870a", "rockchip,rk3288";
-
-	chosen {
-		stdout-path = &uart2;
-	};
-	config {
-		u-boot,dm-pre-reloc;
-	};
 };
 
 &dmc {
@@ -26,17 +19,9 @@
 		0x4 0x8 0x4 0x76 0x4 0x0 0x30 0x0
 		0x1 0x2 0x2 0x4 0x0 0x0 0xc0 0x4
 		0x8 0x1f4>;
-		
-	rockchip,phy-timing = <0x48d7dd93 0x187008d8 0x121076 0x0 0xc3 0x6 0x2>;
+	rockchip,phy-timing = <0x48d7dd93 0x187008d8 0x121076
+		0x0 0xc3 0x6 0x2>;
 	rockchip,sdram-params = <0x20d266a4 0x5b6 2 533000000 6 9 0>;
-};
-
-
-
-
-&pinctrl {
-	u-boot,dm-pre-reloc;
-	
 };
 
 &pwm1 {
@@ -44,16 +29,12 @@
 };
 
 &uart2 {
-	u-boot,dm-pre-reloc;
 	reg-shift = <2>;
 };
 
-&sdmmc {
-	//u-boot,dm-pre-reloc;
-};
-
-&emmc {
+&pinctrl {
 	u-boot,dm-pre-reloc;
+	
 };
 
 &gpio3 {
@@ -63,3 +44,4 @@
 &gpio8 {
 	u-boot,dm-pre-reloc;
 };
+
