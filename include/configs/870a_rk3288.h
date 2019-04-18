@@ -43,7 +43,7 @@
 	"usbboot=rockusb 0 mmc 0\0" \
 	"load_wifi_clk=pmic dev pmic@1c;pmic write 0x20 0x01\0" \
 	"importbootenv=env import -t -r ${scriptaddr} $filesize\0" \
-	"loadbootenv=load ${devtype} ${devnum}:5 ${scriptaddr} /boot/uEnv.txt\0" \
+	"loadbootenv=load ${devtype} ${devnum}:6 ${scriptaddr} /boot/uEnv.txt\0" \
 	"preboot=run load_wifi_clk;run loadbootenv;run importbootenv\0"
 
 #define CONFIG_MENU_SHOW
