@@ -32,18 +32,19 @@
 	BOOTENV
 #endif
 
-
 #undef ENV_MEM_LAYOUT_SETTINGS
 #define ENV_MEM_LAYOUT_SETTINGS \
 	"scriptaddr=0x00000000\0" \
 	"fdt_addr_r=0x08300000\0" \
-	"kernel_addr_r=0x02008000\0"
+	"kernel_addr_r=0x02008000\0" \
+	"ramdisk_addr_r=0x0a200000\0"
 
 #define LINUX_BOOTMENU \
+	"find_uEnv=echo finding uEnv.txt;for i in 4 5 6 7 8 9;do echo ${i};if load ${devtype} ${devnum}:${i} ${scriptaddr} /boot/uEnv.txt; then env set partnum ${i};echo uEnv.txt is in partnumber ${i};fi;done;\0" \
 	"usbboot=rockusb 0 mmc 0\0" \
 	"load_wifi_clk=pmic dev pmic@1c;pmic write 0x20 0x01\0" \
 	"importbootenv=env import -t -r ${scriptaddr} $filesize\0" \
-	"loadbootenv=load ${devtype} ${devnum}:6 ${scriptaddr} /boot/uEnv.txt\0" \
-	"preboot=run load_wifi_clk;run loadbootenv;run importbootenv\0"
+	"loadbootenv=load ${devtype} ${devnum}:${partnum} ${scriptaddr} /boot/uEnv.txt\0" \
+	"preboot=run find_uEnv;run load_wifi_clk;run loadbootenv;run importbootenv\0"
 
 #define CONFIG_MENU_SHOW
