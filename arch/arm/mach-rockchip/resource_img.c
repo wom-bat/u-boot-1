@@ -751,7 +751,7 @@ int rockchip_read_dtb_file(void *fdt_addr)
 		return size;
 
 #if defined(CONFIG_CMD_DTIMG) && defined(CONFIG_OF_LIBFDT_OVERLAY)
-	android_fdt_overlay_apply((void *)fdt_addr);
+	//android_fdt_overlay_apply((void *)fdt_addr);
 #endif
 
 	return size;
