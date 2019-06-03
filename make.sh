@@ -583,14 +583,6 @@ __pack_32bit_trust_image()
 		return
 	fi
 
-<<<<<<< HEAD
-		cd ${RKBIN}
-		${RKTOOLS}/trust_merger ${PLATFORM_SHA} ${PLATFORM_RSA} ${PLATFORM_TRUST_IMG_SIZE} ${BIN_PATH_FIXUP} \
-					${PACK_IGNORE_BL32} ${RKBIN}/RKTRUST/${RKCHIP_TRUST}${PLATFORM_AARCH32}TRUST.ini
-		cd - && mv ${RKBIN}/trust.img ./trust.img
-		echo "pack trust okay! Input: ${RKBIN}/RKTRUST/${RKCHIP_TRUST}${PLATFORM_AARCH32}TRUST.ini"
-	# ARM uses loaderimage
-=======
 	# Parse orignal path
 	TOS=`sed -n "/TOS=/s/TOS=//p" ${ini} |tr -d '\r'`
 	TOS_TA=`sed -n "/TOSTA=/s/TOSTA=//p" ${ini} |tr -d '\r'`
@@ -620,7 +612,6 @@ __pack_32bit_trust_image()
 		${RKTOOLS}/loaderimage --pack --trustos ${RKBIN}/${TOS_TA} ${TEE_OUTPUT} ${TEE_LOAD_ADDR} ${PLATFORM_TRUST_IMG_SIZE}
 	elif [ $TOS ]; then
 		${RKTOOLS}/loaderimage --pack --trustos ${RKBIN}/${TOS}    ${TEE_OUTPUT} ${TEE_LOAD_ADDR} ${PLATFORM_TRUST_IMG_SIZE}
->>>>>>> origin_officeal/next-dev
 	else
 		echo "Can't find any tee bin"
 		exit 1
@@ -677,19 +668,6 @@ pack_trust_image()
 		else
 			__pack_32bit_trust_image ${ini}
 		fi
-<<<<<<< HEAD
-		echo "RKBIN = ${RKBIN}"
-		echo "TEE_LOAD_ADDR = ${TEE_LOAD_ADDR}"
-		echo "PLATFORM_TRUST_IMG_SIZE = ${PLATFORM_TRUST_IMG_SIZE}"
-		echo "TOS_TA = ${TOS_TA}"
-		echo "TOS = ${TOS}"
-		
-		// loaderimage --pack --trustos 
-		
-		
-		echo "pack trust okay!!!!! Input: ${RKBIN}/RKTRUST/${RKCHIP_TRUST}TOS.ini"
-=======
->>>>>>> origin_officeal/next-dev
 	fi
 }
 
