@@ -887,10 +887,10 @@ end:
 static inline void wide2str(const uint16_t *wide, char *str, int len)
 {
 	int i;
-	for (i = 0; i < len; i++) {
+	for (i = 0; i < len - 1; i++) {
 		str[i] = (char)(wide[i] & 0xFF);
 	}
-	str[len] = 0;
+	str[len - 1] = 0;
 }
 
 static bool unpackEntry(rk_boot_entry *entry, const char *name, FILE *inFile)

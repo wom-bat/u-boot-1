@@ -1287,6 +1287,7 @@ static void dwc2_ep0_setup(struct dwc2_udc *dev)
 	/* Nuke all previous transfers */
 	nuke(ep, -EPROTO);
 
+#pragma GCC diagnostic ignored "-Waddress-of-packed-member"
 	/* read control req from fifo (8 bytes) */
 	dwc2_fifo_read(ep, (u32 *)usb_ctrl, 8);
 

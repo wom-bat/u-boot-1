@@ -196,6 +196,8 @@ static void rpc_req(int rpc_prog, int rpc_proc, uint32_t *data, int datalen)
 		rpc_pkt.u.call.vers = htonl(2);	/* portmapper is version 2 */
 	}
 	rpc_pkt.u.call.proc = htonl(rpc_proc);
+
+#pragma GCC diagnostic ignored "-Waddress-of-packed-member"
 	p = (uint32_t *)&(rpc_pkt.u.call.data);
 
 	if (datalen)

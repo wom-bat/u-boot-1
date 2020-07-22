@@ -120,6 +120,8 @@ static int check_reply_packet(uchar *pkt, unsigned dest, unsigned src,
 {
 	struct bootp_hdr *bp = (struct bootp_hdr *)pkt;
 	int retval = 0;
+       
+#pragma GCC diagnostic ignored "-Waddress-of-packed-member"
 
 	if (dest != PORT_BOOTPC || src != PORT_BOOTPS)
 		retval = -1;
@@ -789,6 +791,7 @@ void bootp_request(void)
 	bootp_id += get_timer(0);
 	bootp_id = htonl(bootp_id);
 	bootp_add_id(bootp_id);
+#pragma GCC diagnostic ignored "-Waddress-of-packed-member"
 	net_copy_u32(&bp->bp_id, &bootp_id);
 
 	/*

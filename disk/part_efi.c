@@ -854,6 +854,7 @@ int gpt_verify_partitions(struct blk_desc *dev_desc,
 			return -1;
 		}
 
+#pragma GCC diagnostic ignored "-Waddress-of-packed-member"
 		/* Check if GPT and ENV partition names match */
 		gpt_convert_efi_name_to_char(efi_str, gpt_e[i].partition_name,
 					     PARTNAME_SZ + 1);

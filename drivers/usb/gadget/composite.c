@@ -627,6 +627,8 @@ static int get_string(struct usb_composite_dev *cdev,
 		s->bDescriptorType = USB_DT_STRING;
 
 		sp = composite->strings;
+
+#pragma GCC diagnostic ignored "-Waddress-of-packed-member"
 		if (sp)
 			collect_langs(sp, s->wData);
 

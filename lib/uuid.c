@@ -236,6 +236,7 @@ void uuid_bin_to_str(unsigned char *uuid_bin, char *uuid_str, int str_format)
 void gen_rand_uuid(unsigned char *uuid_bin)
 {
 	struct uuid uuid;
+#pragma GCC diagnostic ignored "-Waddress-of-packed-member"
 	unsigned int *ptr = (unsigned int *)&uuid;
 	int i;
 
